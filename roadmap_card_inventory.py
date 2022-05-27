@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 import json
 
 
+
 options = Options()
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--incognito')
@@ -19,18 +20,21 @@ driver = webdriver.Chrome("/Users/nsanchez/Desktop/tools_build/chromedriver", op
 
 
 
-url = 'https://www.atlassian.com/roadmap/cloud'
+# url = 'https://author.marketing.internal.atlassian.com/wac/roadmap/data-center?mgnlVersion=1.23'
 
-driver.get(url)
-more_buttons = driver.find_elements(By.CLASS_NAME, value="moreLink")
-for x in range(len(more_buttons)):
-  if more_buttons[x].is_displayed():
-      driver.execute_script("arguments[0].click();", more_buttons[x])
-      time.sleep(1)
+# driver.get(url)
+# more_buttons = driver.find_elements(By.CLASS_NAME, value="moreLink")
+# for x in range(len(more_buttons)):
+#   if more_buttons[x].is_displayed():
+#       driver.execute_script("arguments[0].click();", more_buttons[x])
+#       time.sleep(1)
       
-page_source = driver.page_source
+# page_source = driver.page_source
 
+with open("v_12_16.html", "r", encoding='utf-8') as f:
+    text= f.read()
 
+page_source = text
 
 soup = BeautifulSoup(page_source, 'lxml')
 
@@ -48,10 +52,15 @@ for i,card in enumerate(content,start=1):
     print(title)
     desc = 'N/A' if card.find(class_="description").p is None else str(((card.find(class_="description")).p.contents)[0])
     status = str(card.find(class_="custom-category").contents[0])
-    category = str(card.find(class_="custom-category2").contents[0])
-    date = str(card.find(class_="custom-field-1").contents[0])
+    try:
+        category = str(card.find(class_="custom-category2").contents[0])
+    except:
+        category = str("none")
+    try:
+        date = str(card.find(class_="custom-field-1").contents[0])
+    except:
+        date = str("none")
     products = []
-    
     try:
         for product in card.find(class_="custom-product").contents:
             products.append(str(product.string))
@@ -75,7 +84,7 @@ today = date.today()
 
 file_name = f'cloud_cards_{today}'
 
-with open(f'{file_name}.json', 'w') as outfile:
+with open(f'json_outputs/{file_name}.json', 'w') as outfile:
     json.dump(cards_dictionary, outfile)
     
     
@@ -88,7 +97,7 @@ print(y)
 
 df = (pd.DataFrame.from_dict(cards_dictionary)).T
 
-file = f'{file_name}.csv'
+file = f'csv_outputs/{file_name}.csv'
 df.to_csv (file, index = True, header=True)
     
     

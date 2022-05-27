@@ -2,3 +2,7 @@ env
 chromedriver
 geckodriver.log
 .DS_Store
+trash
+csv_outputs
+json_outputs
+input_data_html
