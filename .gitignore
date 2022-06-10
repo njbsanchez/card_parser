@@ -6,3 +6,5 @@ trash
 csv_outputs
 json_outputs
 input_data_html
+reports
+__pycache__
